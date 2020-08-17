@@ -1,7 +1,8 @@
 '''
-The blockchain client is the software that allows:
+The blockchain client is a flask app that allows:
 - The creation of Wallets (which are simple public/private key pairs generated using RSA cryptography), 
 - Making transactions signed using RSA encryption
+usage: python blockchain_client.py -p 8080
 '''
 
 from collections import OrderedDict
@@ -40,8 +41,8 @@ class Transaction:
         """
         private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
         signer = PKCS1_v1_5.new(private_key)
-        hash = SHA.new(str(self.to_dict()).encode('utf8'))  # generating a new hash on the transaction string encoded to utf-8
-        return binascii.hexlify(signer.sign(hash)).decode('ascii')
+        h = SHA.new(str(self.to_dict()).encode('utf8'))  # generating a new hash on the transaction string encoded to utf-8
+        return binascii.hexlify(signer.sign(h)).decode('ascii')  # signature signed with private key
 
 
 app = Flask(__name__)
@@ -54,7 +55,7 @@ def index():
 def make_transaction():
     return render_template('./make_transaction.html')
 
-@app.route('/transactions')
+@app.route('/transactions/')
 def view_transactions():
     return render_template('./view_transactions.html')
 
