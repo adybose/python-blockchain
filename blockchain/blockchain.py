@@ -36,7 +36,6 @@ MINING_DIFFICULTY = 2
 class Blockchain:
 
     def __init__(self):
-        
         self.transactions = []
         self.chain = []
         self.nodes = set()
@@ -44,7 +43,6 @@ class Blockchain:
         self.node_id = str(uuid4()).replace('-', '')
         #Create genesis block
         self.create_block(0, '00')
-
 
     def register_node(self, node_url):
         """
@@ -60,17 +58,15 @@ class Blockchain:
         else:
             raise ValueError('Invalid URL')
 
-
     def verify_transaction_signature(self, sender_address, signature, transaction):
         """
         Check that the provided signature corresponds to transaction
-        signed by the public key (sender_address)
+        signed by the private key
         """
-        public_key = RSA.importKey(binascii.unhexlify(sender_address))
+        public_key = RSA.importKey(binascii.unhexlify(sender_address))  # convert sender address in hex string to sender's public key RSA object
         verifier = PKCS1_v1_5.new(public_key)
         h = SHA.new(str(transaction).encode('utf8'))
-        return verifier.verify(h, binascii.unhexlify(signature))
-
+        return verifier.verify(h, binascii.unhexlify(signature))  # returns True if transaction is signed by private key
 
     def submit_transaction(self, sender_address, recipient_address, value, signature):
         """
@@ -93,7 +89,6 @@ class Blockchain:
             else:
                 return False
 
-
     def create_block(self, nonce, previous_hash):
         """
         Add a block of transactions to the blockchain
@@ -110,7 +105,6 @@ class Blockchain:
         self.chain.append(block)
         return block
 
-
     def hash(self, block):
         """
         Create a SHA-256 hash of a block
@@ -119,7 +113,6 @@ class Blockchain:
         block_string = json.dumps(block, sort_keys=True).encode()
         
         return hashlib.sha256(block_string).hexdigest()
-
 
     def proof_of_work(self):
         """
@@ -133,7 +126,6 @@ class Blockchain:
             nonce += 1
 
         return nonce
-
 
     def valid_proof(self, transactions, last_hash, nonce, difficulty=MINING_DIFFICULTY):
         """
@@ -203,6 +195,7 @@ class Blockchain:
             return True
 
         return False
+
 
 # Instantiate the Node
 app = Flask(__name__)

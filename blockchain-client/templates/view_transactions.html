@@ -97,15 +97,12 @@
     <script>
 
       $(function(){
-
-        
         $('#view_transactions').click(function(){
-
           $.ajax({
             url: document.getElementById("node_url").value + "/chain",
             type: 'GET',
             success: function(response){
-
+              
               console.log(response);
               //Generate Transactions Table
               var transactions = [];

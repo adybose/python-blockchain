@@ -1,7 +1,7 @@
 '''
 The blockchain client is a flask app that allows:
 - The creation of Wallets (which are simple public/private key pairs generated using RSA cryptography), 
-- Making transactions signed using RSA encryption
+- Generating transactions signed using RSA encryption
 usage: python blockchain_client.py -p 8080
 '''
 
@@ -39,10 +39,10 @@ class Transaction:
         """
         Sign transaction with private key
         """
-        private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
-        signer = PKCS1_v1_5.new(private_key)
-        h = SHA.new(str(self.to_dict()).encode('utf8'))  # generating a new hash on the transaction string encoded to utf-8
-        return binascii.hexlify(signer.sign(h)).decode('ascii')  # signature signed with private key
+        private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))  # hex string to RSA object
+        sig_scheme = PKCS1_v1_5.new(private_key)
+        h = SHA.new(str(self.to_dict()).encode('utf8'))  # generating a new hash of the transaction string encoded to utf-8
+        return binascii.hexlify(sig_scheme.sign(h)).decode('ascii')  # signature of the transaction hash signed with private key
 
 
 app = Flask(__name__)
@@ -51,18 +51,18 @@ app = Flask(__name__)
 def index():
     return render_template('./index.html')
 
-@app.route('/create/transaction/')
+@app.route('/generate/transaction')
 def make_transaction():
-    return render_template('./make_transaction.html')
+    return render_template('./generate_transaction.html')
 
-@app.route('/transactions/')
+@app.route('/transactions/')  # trailing slash because it's a list of transactions that will be shown
 def view_transactions():
     return render_template('./view_transactions.html')
 
 @app.route('/create/wallet', methods=['GET'])
 def new_wallet():
     random_gen = Crypto.Random.new().read
-    private_key = RSA.generate(1024, random_gen)
+    private_key = RSA.generate(1024, random_gen)  # RSA object
     public_key = private_key.publickey()
     response = {
             'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
@@ -71,7 +71,7 @@ def new_wallet():
 
     return jsonify(response), 200
 
-@app.route('/create/transaction', methods=['POST'])
+@app.route('/generate/transaction', methods=['POST'])
 def generate_transaction():
     sender_address = request.form['sender_address']
     sender_private_key = request.form['sender_private_key']
@@ -79,7 +79,6 @@ def generate_transaction():
     value = request.form['amount']
 
     transaction = Transaction(sender_address, sender_private_key, recipient_address, value)
-
     response = {'transaction': transaction.to_dict(), 'signature': transaction.sign_transaction()}
 
     return jsonify(response), 200
