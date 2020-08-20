@@ -22,3 +22,5 @@ To sync up, a node must add other nodes to fetch the latest state of the blockch
 - Install dependencies and activate virtual environment using pipenv
 - Run the blockchain client with `python blockchain-client/client.py`
 - Run multiple blockchain nodes in separate console screens with `python blockchain-node/blockchain_node.py -p <PORT_NUMBER>` where PORT _NUMBER is a unique port number a flask node will run.
+
+DISCLAIMER: This application is purely for educational purposes and is not intended for production use. USE AT YOUR OWN RISK.
