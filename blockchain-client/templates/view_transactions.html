@@ -33,7 +33,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/create/transaction">Make Transaction</a>
+              <a class="nav-link" href="/generate/transaction">Make Transaction</a>
             </li>
             <li class="nav-item active">
               <a class="nav-link" href="/transactions">View Transactions
@@ -99,23 +99,23 @@
       $(function(){
         $('#view_transactions').click(function(){
           $.ajax({
-            url: document.getElementById("node_url").value + "/chain",
+            url: document.getElementById("node_url").value + "/chain",  // view all transactions from this node
             type: 'GET',
-            success: function(response){
-              
+            success: function(response){  // response is a JSON received from the full_chain GET API in the /chain endpoint in blockchain.py
               console.log(response);
+              // console.log(response['chain']);
+              // console.log(response.chain);
+              // console.log(response.length);
+              // console.log(response['length']);
               //Generate Transactions Table
               var transactions = [];
               count = 1;
-
-              for (i = 1; i < response.length; i++) { 
-                for (j = 0; j < response["chain"][i]["transactions"].length; j++) {
-
+              for (i = 1; i < response.length; i++) { // response.length is same as response['length']. Represents the number of blocks or chain length of the blockchain
+                for (j = 0; j < response["chain"][i]["transactions"].length; j++) {  // each block in the chain has some transactions
                   //format date 
                   var options = {  year: "numeric", month: "short",  day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"  };
                   var date = new Date(response["chain"][i]["timestamp"] * 1000);
                   var formattedDateTime = date.toLocaleTimeString("en-us", options);
-
                   transaction = [count,
                                 response["chain"][i]["transactions"][j]["recipient_address"],
                                 response["chain"][i]["transactions"][j]["sender_address"],
@@ -123,40 +123,31 @@
                                 formattedDateTime,
                                 response["chain"][i]["block_number"]];
                   transactions.push(transaction);
-
                   count += 1;
                 };
               };
 
               // Restrict a column to 10 characters, do split words
-                $('#transactions_table').dataTable( {
-                  data: transactions,
-                  columns: [{ title: "#" },
-                            { title: "Recipient Address"},
-                            { title: "Sender Address"},
-                            { title: "Value"},
-                            { title: "Timestamp"},
-                            { title: "Block"}],
-                  columnDefs: [ {targets: [1,2,3,4,5], render: $.fn.dataTable.render.ellipsis( 25 )}]
-                } );
-
+              $('#transactions_table').dataTable({
+                data: transactions,  // doesn't print the genesis block because it doesnt have any transaction
+                columns: [{ title: "#" },
+                          { title: "Recipient Address"},
+                          { title: "Sender Address"},
+                          { title: "Value"},
+                          { title: "Timestamp"},
+                          { title: "Block"}],
+                columnDefs: [ {targets: [1,2,3,4,5], render: $.fn.dataTable.render.ellipsis( 25 )}]
+              });
             },
             error: function(error){
               console.log(error);
             }
           });
         });
-
-
       })
 
-
-
-
     </script>
-
-
-
+    
   </body>
 
 </html>

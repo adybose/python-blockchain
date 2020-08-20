@@ -5,7 +5,11 @@ This flask app implements a basic blockchain that can:
 - configure connections between different blockchain nodes or peers
 
 usage: python blockchain.py -p 5000
+
+TODO: Redesign blockchain with Block class?
+TODO: Fix syncing problem
 '''
+
 
 from collections import OrderedDict
 
@@ -36,7 +40,7 @@ MINING_DIFFICULTY = 2
 class Blockchain:
 
     def __init__(self):
-        self.transactions = []
+        self.transactions = []  # transactions to be addedd to the next block in the blockchain
         self.chain = []
         self.nodes = set()
         #Generate random number to be used as node_id
@@ -50,10 +54,10 @@ class Blockchain:
         """
         #Checking node_url has valid format
         parsed_url = urlparse(node_url)
-        if parsed_url.netloc:
+        if parsed_url.netloc:  # if node url if the form http://127.0.0.1:5000
             self.nodes.add(parsed_url.netloc)
         elif parsed_url.path:
-            # Accepts an URL without scheme like '192.168.0.5:5000'.
+            # Accepts an URL without scheme and netloc like localhost:5000
             self.nodes.add(parsed_url.path)
         else:
             raise ValueError('Invalid URL')
@@ -109,7 +113,7 @@ class Blockchain:
         """
         Create a SHA-256 hash of a block
         """
-        # We must make sure that the Dictionary is Ordered, or we'll have inconsistent hashes
+        # We must make sure that the Dictionary is Ordered/Serialized, or we'll have inconsistent hashes
         block_string = json.dumps(block, sort_keys=True).encode()
         
         return hashlib.sha256(block_string).hexdigest()
@@ -212,8 +216,6 @@ def index():
 def configure():
     return render_template('./configure.html')
 
-
-
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.form
@@ -234,7 +236,7 @@ def new_transaction():
 
 @app.route('/transactions/get', methods=['GET'])
 def get_transactions():
-    #Get transactions from transactions pool
+    # Get transactions from transactions pool
     transactions = blockchain.transactions
 
     response = {'transactions': transactions}
@@ -243,7 +245,7 @@ def get_transactions():
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
-        'chain': blockchain.chain,
+        'chain': blockchain.chain,  # chain is a list of blocks
         'length': len(blockchain.chain),
     }
     return jsonify(response), 200
@@ -270,8 +272,6 @@ def mine():
     }
     return jsonify(response), 200
 
-
-
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
     values = request.form
@@ -289,7 +289,6 @@ def register_nodes():
     }
     return jsonify(response), 201
 
-
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts()
@@ -305,7 +304,6 @@ def consensus():
             'chain': blockchain.chain
         }
     return jsonify(response), 200
-
 
 @app.route('/nodes/get', methods=['GET'])
 def get_nodes():

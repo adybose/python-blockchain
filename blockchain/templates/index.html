@@ -42,9 +42,8 @@
       </div>
     </nav>
 
-    <!--  -->
+    <!-- Refresh Transactions to be Mined -->
     <div class="container">
-
       <div class="row">
         <div class="col-lg-12">
           <div class="card-body">
@@ -67,13 +66,12 @@
       <div class="col-lg-12 text-center">
         <input type="button" id="mine_button" class="btn btn-primary btn-lg" value="Mine">
       </div>
-
     </div>
 
     <hr>
 
+    <!-- Refresh Transactions on the Blockchain -->
     <div class="container">
-
       <div class="row">
         <div class="col-lg-12">
           <div class="card-body">
@@ -85,7 +83,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- Blockchain Transactions Table -->
@@ -94,46 +91,41 @@
       </table>
     </div>
 
+
     <!-- Bootstrap core JavaScript -->
     <script src="/static/vendor/jquery/jquery.min.js"></script>
     <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="/static/vendor/DataTables/js/datatables.min.js"></script>
     <script src="/static/vendor/DataTables/js/ellipsis.js"></script>
 
-
     <script>
       $(function(){
-
-        $.ajax({
+        $.ajax({  // makes the request automatically when the script loads with the page
           url: "/transactions/get",
           type: 'GET',
           success: function(response){
+            //Generate Transactions Table for unmined transactions
+            var transactions = [];
+            count = 1;
+            for (i = 0; i < response['transactions'].length; i++) { 
+              transaction = [count,
+                            response['transactions'][i]["recipient_address"],
+                            response['transactions'][i]["sender_address"],
+                            response['transactions'][i]["value"]];
 
-              //Generate Transactions Table
-              var transactions = [];
-              count = 1;
+              transactions.push(transaction);
+              count += 1;
+            };
 
-              for (i = 0; i < response['transactions'].length; i++) { 
-
-                transaction = [count,
-                              response['transactions'][i]["recipient_address"],
-                              response['transactions'][i]["sender_address"],
-                              response['transactions'][i]["value"]];
-
-                  transactions.push(transaction);
-
-                  count += 1;
-              };
-
-            // Restrict a column to 10 characters, do split words
-              $('#unmined_transactions_table').dataTable( {
-                data: transactions,
-                columns: [{ title: "#" },
-                          { title: "Recipient Address"},
-                          { title: "Sender Address"},
-                          { title: "Value"}],
-                columnDefs: [ {targets: [1,2,3], render: $.fn.dataTable.render.ellipsis( 25 )}]
-              } );
+            // display transactions, restrict a column to 10 characters, do split words
+            $('#unmined_transactions_table').dataTable( {
+              data: transactions,
+              columns: [{ title: "#" },
+                        { title: "Recipient Address"},
+                        { title: "Sender Address"},
+                        { title: "Value"}],
+              columnDefs: [ {targets: [1,2,3], render: $.fn.dataTable.render.ellipsis( 25 )}]
+            } );
 
           },
           error: function(error){
@@ -141,21 +133,16 @@
           }
         });
 
-
-
         $.ajax({
           url: "/chain",
           type: 'GET',
           success: function(response){
-
             //console.log(response);
-            //Generate Transactions Table
+            //Generate Transactions Table for mined transactions on the blockchain, same as view_transactions.html from blockchain-client
             var transactions = [];
             count = 1;
-
             for (i = 1; i < response.length; i++) { 
               for (j = 0; j < response["chain"][i]["transactions"].length; j++) {
-
                 //format date 
                 var options = {  year: "numeric", month: "short",  day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"  };
                 var date = new Date(response["chain"][i]["timestamp"] * 1000);
@@ -173,18 +160,17 @@
               };
             };
 
-            // Restrict a column to 10 characters, do split words
-              $('#transactions_table').dataTable( {
-                data: transactions,
-                columns: [{ title: "#" },
-                          { title: "Recipient Address"},
-                          { title: "Sender Address"},
-                          { title: "Value"},
-                          { title: "Timestamp"},
-                          { title: "Block"}],
-                columnDefs: [ {targets: [1,2,3,4,5], render: $.fn.dataTable.render.ellipsis( 25 )}]
-              } );
-
+            // Display the mined transactions in a table, restrict a column to 10 characters, do split words
+            $('#transactions_table').dataTable({
+              data: transactions,
+              columns: [{ title: "#" },
+                        { title: "Recipient Address"},
+                        { title: "Sender Address"},
+                        { title: "Value"},
+                        { title: "Timestamp"},
+                        { title: "Block"}],
+              columnDefs: [ {targets: [1,2,3,4,5], render: $.fn.dataTable.render.ellipsis( 25 )}]
+            });
           },
           error: function(error){
             console.log(error);
@@ -193,45 +179,34 @@
 
 
         $("#mine_button").click(function () {
-
           $.ajax({
             url: "/mine",
             type: "GET",
             success: function(response){
-
-              window.location.reload();
-              
+              window.location.reload();   
             },
             error: function(error){
               console.log(error);
             }
           });
-
         });
 
 
         $("#refresh_transactions").click(function () {
-
           window.location.reload();
-
         });
 
-
         $("#refresh_blockchain").click(function () {
-
           $.ajax({
             url: "/nodes/resolve",
             type: "GET",
             success: function(response){
-
               window.location.reload();
-              
             },
             error: function(error){
               console.log(error);
             }
           });
-
         });
 
 

@@ -88,7 +88,6 @@
         </div>
 
         <div class="col-lg-12" id="list_nodes">
-
         </div>
 
       </div>
@@ -103,61 +102,42 @@
 
     <script>
       $(function(){
-
           $("#add_node_button").click(function () {
-            //console.log($('#confirmation_transaction_form').serialize());
-
-            $.ajax({
+            $.ajax({  // this ajax request executes when the element/button with id add_node_button is clicked 
               url: "/nodes/register",
               type: "POST",
               dataType : 'json',
               data: $('#node_form').serialize(),
               success: function(response){
-
                 console.log(response);
                 document.getElementById("nodes").value = "";  
                 window.location.reload();
-
               },
               error: function(error){
                 console.log(error);
               }
             });
-
           });
 
-
-        $.ajax({
+        $.ajax({  // this ajax request executes automatically when the script loads along with the page
           url: "/nodes/get",
           type: 'GET',
           success: function(response){
-
             console.log(response['nodes']);
             var node = "";
-            
             for (i = 0; i < response['nodes'].length; i++) { 
               //node = "<li>" + response['nodes'][i] + "</li>";
               node = "<li> <a href=http://" + response['nodes'][i] + ">" + response['nodes'][i] +"</a></li>";
               document.getElementById("list_nodes").innerHTML += node;
-
             };
-          
           },
           error: function(error){
             console.log(error);
           }
         });
-
-
       })
 
-
-
-
-
     </script>
-
-
 
   </body>
 

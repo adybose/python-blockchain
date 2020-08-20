@@ -231,10 +231,8 @@
                 console.log(error);
               }
             });
-
           });
       });
-
 
       $(function () {
           $("#button_confirm_transaction").click(function () {
@@ -242,11 +240,10 @@
             $.ajax({
               url: document.getElementById("node_url").value + "/transactions/new",
               type: "POST",
-              headers: {'Access-Control-Allow-Origin':'*'},
+              headers: {'Access-Control-Allow-Origin':'*'},  // allow CORS for POST request?
               dataType : 'json',
               data: $('#confirmation_transaction_form').serialize(),
               success: function(response){
-
                 //reset both forms
                 $("#transaction_form")[0].reset();
                 $("#confirmation_transaction_form")[0].reset();
@@ -259,7 +256,6 @@
 
                 $("#basicModal").modal('hide');
                 $("#success_transaction_modal").modal('show');
-                
               },
               error: function(error){
                 console.log(error);
