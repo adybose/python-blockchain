@@ -3,8 +3,6 @@ A simple blockchain in Python using the Flask micro web framework for the main i
 
 ![Blockchain Client](https://raw.githubusercontent.com/adbose/python-blockchain/share/pyblockchain_home.png)
 
-Based on [this](http://adilmoujahid.com/posts/2018/03/intro-blockchain-bitcoin-python/) article by [Adil Moujahid](https://github.com/adilmoujahid).
-
 The implementation has 2 parts:
 
 - A client to generate wallets and transactions
@@ -25,4 +23,5 @@ To sync up, a node must add other nodes to fetch the latest state of the blockch
 - Run the blockchain client with `python blockchain-client/client.py`
 - Run multiple blockchain nodes in separate console screens with `python blockchain-node/blockchain_node.py -p <PORT_NUMBER>` where PORT _NUMBER is a unique port number a flask node will run.
 
-DISCLAIMER: This application is purely for educational purposes and is not intended for production use. USE AT YOUR OWN RISK.
+DISCLAIMER: This project is based on [this blog post](http://adilmoujahid.com/posts/2018/03/intro-blockchain-bitcoin-python/) and it's accompanying [repository](https://github.com/adilmoujahid/blockchain-python-tutorial).
+This application is purely for educational purposes and is not intended for production use. USE AT YOUR OWN RISK.
